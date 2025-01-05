@@ -28,7 +28,6 @@
 						 {:name "etcd"
 							:os   debian/os
 							:db   (db "v3.1.5")
-							:ssh    {:dummy? true}
 							:pure-generators true}))
 
 (defn -main
