@@ -3,9 +3,10 @@
 			[clojure.string :as str]
 			[verschlimmbesserung.core :as v]
 			[jepsen [cli :as cli]
-			 [control :as c]
-			 [db :as db]
-			 [tests :as tests]]
+			        [client :as client]
+			        [control :as c]
+							[db :as db]
+			        [tests :as tests]]
 			[jepsen.control.util :as cu]
 			[jepsen.os.debian :as debian]))
 
