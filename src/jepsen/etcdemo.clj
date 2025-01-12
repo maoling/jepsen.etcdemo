@@ -65,7 +65,9 @@
 											 (Thread/sleep 10000)))
 
 						 (teardown! [_ test node]
-												(info node "tearing down etcd"))))
+												(info node "tearing down etcd")
+												(cu/stop-daemon! binary pidfile)
+												(c/su (c/exec :rm :-rf dir)))))
 
 
 (defn etcd-test
