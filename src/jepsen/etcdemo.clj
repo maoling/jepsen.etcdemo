@@ -19,7 +19,7 @@
 
 		(invoke! [_ test op])
 
-		(teardonw! [this test])
+		(teardown! [this test])
 
 		(close! [_ test]))
 
