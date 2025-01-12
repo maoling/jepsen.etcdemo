@@ -1,12 +1,26 @@
 (ns jepsen.etcdemo
 		(:require [clojure.tools.logging :refer :all]
 			[clojure.string :as str]
+			[verschlimmbesserung.core :as v]
 			[jepsen [cli :as cli]
 			 [control :as c]
 			 [db :as db]
 			 [tests :as tests]]
 			[jepsen.control.util :as cu]
 			[jepsen.os.debian :as debian]))
+
+(defrecord Client [conn]
+		client/Client
+		(open! [this test node]
+			this)
+
+		(setup! [this test])
+
+		(invoke! [_ test op])
+
+		(teardonw! [this test])
+
+		(close! [_ test]))
 
 (def dir "/opt/etcd")
 (def binary "etcd")
@@ -82,6 +96,7 @@
 						 {:name "etcd"
 							:os   debian/os
 							:db   (db "v3.1.5")
+							:client (Client. nil)
 							:pure-generators true}))
 
 (defn -main
