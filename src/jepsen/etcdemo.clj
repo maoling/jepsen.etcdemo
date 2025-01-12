@@ -46,7 +46,23 @@
 										 (c/su
 											 (let [url (str "https://storage.googleapis.com/etcd/" version
 																			"/etcd-" version "-linux-amd64.tar.gz")]
-														(cu/install-archive! url dir))))
+														(cu/install-archive! url dir))
+
+											 (cu/start-daemon!
+												 {:logfile logfile
+													:pidfile pidfile
+													:chdir   dir}
+												 binary
+												 :--log-output                   :stderr
+												 :--name                         (name node)
+												 :--listen-peer-urls             (peer-url   node)
+												 :--listen-client-urls           (client-url node)
+												 :--advertise-client-urls        (client-url node)
+												 :--initial-cluster-state        :new
+												 :--initial-advertise-peer-urls  (peer-url node)
+												 :--initial-cluster              (initial-cluster test))
+
+											 (Thread/sleep 10000)))
 
 						 (teardown! [_ test node]
 												(info node "tearing down etcd"))))
