@@ -1,14 +1,15 @@
 (ns jepsen.etcdemo
 		(:require [clojure.tools.logging :refer :all]
-			[clojure.string :as str]
-			[verschlimmbesserung.core :as v]
-			[jepsen [cli :as cli]
-			        [client :as client]
-			        [control :as c]
-							[db :as db]
-			        [tests :as tests]]
-			[jepsen.control.util :as cu]
-			[jepsen.os.debian :as debian]))
+							[clojure.string :as str]
+							[verschlimmbesserung.core :as v]
+							[jepsen [cli :as cli]
+											[client :as client]
+											[control :as c]
+											[db :as db]
+											[generator :as gen]
+											[tests :as tests]]
+							[jepsen.control.util :as cu]
+							[jepsen.os.debian :as debian]))
 
 (defrecord Client [conn]
 		client/Client
@@ -94,11 +95,15 @@
 			[opts]
 			(merge tests/noop-test
 						 opts
-						 {:name "etcd"
+						 {:pure-:generators true
+							:name "etcd"
 							:os   debian/os
 							:db   (db "v3.1.5")
 							:client (Client. nil)
-							:pure-generators true}))
+							:generator (->> r
+															(gen/stagger 1)
+															(gen/nemesis nil)
+															(gen/time-limit 15))}))
 
 (defn -main
   "Handles command line arguments. Can either run a test, or a web server for
