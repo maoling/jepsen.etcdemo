@@ -45,6 +45,11 @@
 										(str node "=" (peer-url node))))
 					 (str/join ",")))
 
+(defn parse-long-nil
+			"Parses a string to a Long. Passes through `nil`."
+			[s]
+			(when s (parse-long s)))
+
 (defrecord Client [conn]
 					 client/Client
 					 (open! [this test node]
@@ -55,7 +60,7 @@
 
 					 (invoke! [this test op]
 										(case (:f op)
-													:read (assoc op :type :ok, :value (v/get conn "foo"))
+													:read (assoc op :type :ok, :value (parse-long-nil (v/get conn "foo")))
 													:write (do (v/reset! conn "foo" (:value op))
 																		 (assoc op :type :ok))))
 
