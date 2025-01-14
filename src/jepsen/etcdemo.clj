@@ -14,13 +14,14 @@
 (defrecord Client [conn]
 		client/Client
 		(open! [this test node]
-			this)
+			(assoc this :conn (v/connect (client-url node)
+																	 {:timeout 5000})))
 
 		(setup! [this test])
 
-		(invoke! [this test op])
+		(invoke! [this test op]
 					 (case (:f op)
-							:read (assoc op :type :ok, :value (v/get conn "foo")))
+							:read (assoc op :type :ok, :value (v/get conn "foo"))))
 
 		(teardown! [this test])
 
