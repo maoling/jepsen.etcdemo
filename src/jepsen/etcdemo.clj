@@ -55,7 +55,9 @@
 
 					 (invoke! [this test op]
 										(case (:f op)
-													:read (assoc op :type :ok, :value (v/get conn "foo"))))
+													:read (assoc op :type :ok, :value (v/get conn "foo"))
+													:write (do (v/reset! conn "foo" (:value op))
+																		 (assoc op :type :ok))))
 
 					 (teardown! [this test])
 
@@ -108,7 +110,7 @@
 							:os   debian/os
 							:db   (db "v3.1.5")
 							:client (Client. nil)
-							:generator (->> r
+							:generator (->> (gen/mix [r w])
 															(gen/stagger 1)
 															(gen/nemesis nil)
 															(gen/time-limit 15))}))
