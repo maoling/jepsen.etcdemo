@@ -10,7 +10,7 @@
 											[tests :as tests]]
 							[jepsen.control.util :as cu]
 							[jepsen.os.debian :as debian]
-							[slingshot.slingshot.s :refer [try++]]))
+							[slingshot.slingshot :refer [try+]]))
 
 
 (defn r [_ _] {:type :invoke, :f :read, :value nil})
