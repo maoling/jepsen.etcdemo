@@ -9,7 +9,8 @@
 											[generator :as gen]
 											[tests :as tests]]
 							[jepsen.control.util :as cu]
-							[jepsen.os.debian :as debian]))
+							[jepsen.os.debian :as debian]
+							[slingshot.slingshot.s :refer [try++]]))
 
 
 (defn r [_ _] {:type :invoke, :f :read, :value nil})
@@ -63,10 +64,13 @@
 													:read (assoc op :type :ok, :value (parse-long-nil (v/get conn "foo")))
 													:write (do (v/reset! conn "foo" (:value op))
 																		 (assoc op :type :ok))
-													:cas (let [[old new] (:value op)]
-																(assoc op :type (if (v/cas! conn "foo" old new)
-																								:ok
-																		            :fail)))))
+													:cas  (try+
+																	 (let [[old new] (:value op)]
+																			(assoc op :type (if (v/cas! conn "foo" old new)
+																									:ok
+																									:fail)))
+																	 (catch [:errorCode 100] ex
+																		 (assoc op :type :fail, :error :not-found)))))
 
 					 (teardown! [this test])
 
