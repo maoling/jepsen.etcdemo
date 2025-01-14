@@ -11,21 +11,6 @@
 							[jepsen.control.util :as cu]
 							[jepsen.os.debian :as debian]))
 
-(defrecord Client [conn]
-		client/Client
-		(open! [this test node]
-			(assoc this :conn (v/connect (client-url node)
-																	 {:timeout 5000})))
-
-		(setup! [this test])
-
-		(invoke! [this test op]
-					 (case (:f op)
-							:read (assoc op :type :ok, :value (v/get conn "foo"))))
-
-		(teardown! [this test])
-
-		(close! [_ test]))
 
 (defn r [_ _] {:type :invoke, :f :read, :value nil})
 (defn w [_ _] {:type :invoke, :f :write, :value (rand-int 5)})
@@ -59,6 +44,22 @@
 					 (map (fn [node]
 										(str node "=" (peer-url node))))
 					 (str/join ",")))
+
+(defrecord Client [conn]
+					 client/Client
+					 (open! [this test node]
+									(assoc this :conn (v/connect (client-url node)
+																							 {:timeout 5000})))
+
+					 (setup! [this test])
+
+					 (invoke! [this test op]
+										(case (:f op)
+													:read (assoc op :type :ok, :value (v/get conn "foo"))))
+
+					 (teardown! [this test])
+
+					 (close! [_ test]))
 
 (defn db
 			"Etcd DB for a particular version."
