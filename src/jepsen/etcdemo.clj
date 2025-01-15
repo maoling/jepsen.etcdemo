@@ -126,9 +126,10 @@
 							:os   debian/os
 							:db   (db "v3.1.5")
 							:client (Client. nil)
-							:checker (checker/linearizable
-												 {:model (model/cas-register)
-													:algorithm :linear})
+							:checker  (checker/compose
+													{:perf   (checker/perf)
+													 :linear (checker/linearizable {:model 			(model/cas-register)
+																													:algorithm :linear})})
 							:generator (->> (gen/mix [r w cas])
 															(gen/stagger 1)
 															(gen/nemesis nil)
