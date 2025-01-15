@@ -1,7 +1,6 @@
 (ns jepsen.etcdemo
 		(:require [clojure.tools.logging :refer :all]
 							[clojure.string :as str]
-							[verschlimmbesserung.core :as v]
 							[jepsen [checker :as checker]
 							 				[cli :as cli]
 											[client :as client]
@@ -13,6 +12,7 @@
 							[jepsen.os.debian :as debian]
 							[knossos.model :as model]
 							[slingshot.slingshot :refer [try+]]
+							[verschlimmbesserung.core :as v])
 		(:import (knossos.model Model)))
 
 
