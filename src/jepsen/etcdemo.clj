@@ -2,7 +2,8 @@
 		(:require [clojure.tools.logging :refer :all]
 							[clojure.string :as str]
 							[verschlimmbesserung.core :as v]
-							[jepsen [cli :as cli]
+							[jepsen [checker :as checker]
+							 				[cli :as cli]
 											[client :as client]
 											[control :as c]
 											[db :as db]
@@ -10,7 +11,9 @@
 											[tests :as tests]]
 							[jepsen.control.util :as cu]
 							[jepsen.os.debian :as debian]
-							[slingshot.slingshot :refer [try+]]))
+							[knossos.model :as model]
+							[slingshot.slingshot :refer [try+]]
+		(:import (knossos.model Model)))
 
 
 (defn r [_ _] {:type :invoke, :f :read, :value nil})
@@ -123,6 +126,9 @@
 							:os   debian/os
 							:db   (db "v3.1.5")
 							:client (Client. nil)
+							:checker (checker/linearizable
+												 {:model (model/cas-register)
+													:algorithm :linear})
 							:generator (->> (gen/mix [r w cas])
 															(gen/stagger 1)
 															(gen/nemesis nil)
