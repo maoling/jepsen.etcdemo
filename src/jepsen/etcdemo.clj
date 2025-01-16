@@ -128,7 +128,7 @@
 							:os   debian/os
 							:db   (db "v3.1.5")
 							:client (Client. nil)
-							:nemesis (:nemesis/partition-random-halves)
+							:nemesis (nemesis/partition-random-halves)
 							:checker  (checker/compose
 													{:perf   (checker/perf)
 													 :linear (checker/linearizable {:model 			(model/cas-register)
