@@ -66,7 +66,10 @@
 
 					 (invoke! [this test op]
 										(case (:f op)
-													:read (assoc op :type :ok, :value (parse-long-nil (v/get conn "foo")))
+													:read (let [value (-> conn
+																								(v/get conn "foo" {:quorum? true})
+																								parse-long-nil)]
+																(assoc op :type :ok, :value value))
 													:write (do (v/reset! conn "foo" (:value op))
 																		 (assoc op :type :ok))
 													:cas  (try+
@@ -74,8 +77,8 @@
 																			(assoc op :type (if (v/cas! conn "foo" old new)
 																									:ok
 																									:fail)))
-																	 (catch [:errorCode 100] ex
-																		 (assoc op :type :fail, :error :not-found)))))
+																(catch [:errorCode 100] ex
+																	 (assoc op :type :fail, :error :not-found)))))
 
 					 (teardown! [this test])
 
