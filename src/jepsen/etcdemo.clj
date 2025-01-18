@@ -64,30 +64,30 @@
 
            (setup! [this test])
 
-           (invoke! [_ test op]
-                    (let [[k v] (:value op)]
-                         (try+
-                           (case (:f op)
-                                 :read (let [value (-> conn
-                                                       (v/get k {:quorum? true})
-                                                       parse-long-nil)]
-                                            (assoc op :type :ok, :value (independent/tuple k value)))
+					 (invoke! [_ test op]
+										(let [[k v] (:value op)]
+												 (try+
+													 (case (:f op)
+																 :read (let [value (-> conn
+																											 (v/get k {:quorum? true})
+																											 parse-long-nil)]
+																						(assoc op :type :ok, :value (independent/tuple k value)))
 
-                                 :write (do (v/reset! conn "foo" k v)
-                                            (assoc op :type :ok))
+																 :write (do (v/reset! conn k v)
+																						(assoc op :type :ok))
 
-                                 :cas (let [[old new] v]
-                                           (assoc op :type (if (v/cas! conn k old new)
-                                                             :ok
-                                                             :fail))))
+																 :cas (let [[old new] v]
+																					 (assoc op :type (if (v/cas! conn k old new)
+																														 :ok
+																														 :fail))))
 
-                           (catch java.net.SocketTimeoutException e
-                             (assoc op
-                                    :type (if (= :read (:f op)) :fail :info)
-                                    :error :timeout))
+													 (catch java.net.SocketTimeoutException e
+														 (assoc op
+																		:type  (if (= :read (:f op)) :fail :info)
+																		:error :timeout))
 
-                           (catch [:errorCode 100] e
-                             (assoc op :type :fail, :error :not-found)))))
+													 (catch [:errorCode 100] e
+														 (assoc op :type :fail, :error :not-found)))))
 
            (teardown! [this test])
 
