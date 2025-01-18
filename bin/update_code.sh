@@ -1,3 +1,3 @@
-git fetch origin;
+git fetch china-origin;
 
-git rebase origin/main
+git rebase china-origin/main

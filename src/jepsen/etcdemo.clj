@@ -65,20 +65,24 @@
 					 (setup! [this test])
 
 					 (invoke! [this test op]
-										(case (:f op)
-													:read (let [value (-> conn
-																								(v/get "foo" {:quorum? true})
-																								parse-long-nil)]
-																(assoc op :type :ok, :value value))
-													:write (do (v/reset! conn "foo" (:value op))
-																		 (assoc op :type :ok))
-													:cas  (try+
-																	 (let [[old new] (:value op)]
-																			(assoc op :type (if (v/cas! conn "foo" old new)
-																									:ok
-																									:fail)))
-																(catch [:errorCode 100] ex
-																	 (assoc op :type :fail, :error :not-found)))))
+										(try+
+										    (case (:f op)
+														:read (let [value (-> conn
+																									(v/get "foo" {:quorum? true})
+																									parse-long-nil)]
+																			  (assoc op :type :ok, :value value))
+														:write (do (v/reset! conn "foo" (:value op))
+																			  (assoc op :type :ok))
+														:cas   (let [[old new] (:value op)]
+																				(assoc op :type (if (v/cas! conn "foo" old new)
+																										:ok
+																										:fail)))
+										(catch java.net.SocketTimeoutException e
+											 (assoc op
+															:type  (if (= :read (:f op)) :fail :info)
+															:error :timeout))
+										(catch [:errorCode 100] e
+											 (assoc op :type :fail, :error :not-found)))))
 
 					 (teardown! [this test])
 
