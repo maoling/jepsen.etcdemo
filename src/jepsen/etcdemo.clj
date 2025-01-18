@@ -76,13 +76,13 @@
 														:cas   (let [[old new] (:value op)]
 																				(assoc op :type (if (v/cas! conn "foo" old new)
 																										:ok
-																										:fail)))
+																										:fail))))
 										(catch java.net.SocketTimeoutException e
 											 (assoc op
 															:type  (if (= :read (:f op)) :fail :info)
 															:error :timeout))
 										(catch [:errorCode 100] e
-											 (assoc op :type :fail, :error :not-found)))))
+											 (assoc op :type :fail, :error :not-found))))
 
 					 (teardown! [this test])
 
