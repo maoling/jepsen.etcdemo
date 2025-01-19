@@ -167,36 +167,7 @@
                    :checker    (checker/compose
                                  {:perf     (checker/perf)
                                   :workload (:checker workload)})
-                   :generator       (->> (independent/concurrent-generator
-                                           10
-                                           (range)
-                                           (fn [k]
-                                               (->> (gen/mix [r w cas])
-                                                    (gen/stagger (/ (:rate opts)))
-                                                    (gen/limit (:ops-per-key opts)))))
-                                         (gen/nemesis
-                                           (->> [(gen/sleep 5)
-                                                 {:type :info, :f :start}
-                                                 (gen/sleep 5)
-                                                 {:type :info, :f :stop}]
-                                                cycle))
-                                         (gen/time-limit (:time-limit opts)))}
-                  {:client    (:client workload)
-                   :checker   (:checker workload)
-                   :generator (gen/phases
-                                (->> (:generator workload)
-                                     (gen/stagger (/ (:rate opts)))
-                                     (gen/nemesis
-                                       (cycle [(gen/sleep 5)
-                                               {:type :info, :f :start}
-                                               (gen/sleep 5)
-                                               {:type :info, :f :stop}]))
-                                     (gen/time-limit (:time-limit opts)))
-                                (gen/log "Healing cluster")
-                                (gen/nemesis (gen/once {:type :info, :f :stop}))
-                                (gen/log "Waiting for recovery")
-                                (gen/sleep 10)
-                                (gen/clients (:final-generator workload)))})))
+                    })))
 
 
 (defn -main
