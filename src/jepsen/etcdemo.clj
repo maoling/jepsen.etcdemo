@@ -132,11 +132,11 @@
 	"Additional command line options."
 	[["-q" "--quorum" "Use quorum reads, instead of reading from any primary."]
 	 ["-r" "--rate HZ" "Approximate number of requests per second, per thread."
-		:default 10
+		:default  10
 		:parse-fn read-string
-		:validate [#(and (number? %) (pos? %))] "Must be a positive number"]
-	 [nil "--ops-per-key NUM" "Maximum number of operations on any given key. "
-		:default 10
+		:validate [#(and (number? %) (pos? %)) "Must be a positive number"]]
+	 [nil "--ops-per-key NUM" "Maximum number of operations on any given key."
+		:default  100
 		:parse-fn parse-long
 		:validate [pos? "Must be a positive integer."]]])
 
