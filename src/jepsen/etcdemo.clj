@@ -69,7 +69,7 @@
 												 (try+
 													 (case (:f op)
 																 :read (let [value (-> conn
-																											 (v/get k {:quorum? true})
+																											 (v/get k {:quorum? (:quorum test)})
 																											 parse-long-nil)]
 																						(assoc op :type :ok, :value (independent/tuple k value)))
 
