@@ -106,21 +106,6 @@
              (log-files [_ test node]
                         [logfile])))
 
-(def cli-opts
-	"Additional command line options."
-	[["-w" "--workload NAME" "What workload should we run?"
-    :missing  (str "--workload " (cli/one-of workloads))
-    :validate [workloads (cli/one-of workloads)]]
-   ["-q" "--quorum" "Use quorum reads, instead of reading from any primary."]
-	 ["-r" "--rate HZ" "Approximate number of requests per second, per thread."
-		:default  10
-		:parse-fn read-string
-		:validate [#(and (number? %) (pos? %)) "Must be a positive number"]]
-	 [nil "--ops-per-key NUM" "Maximum number of operations on any given key."
-		:default  100
-		:parse-fn parse-long
-		:validate [pos? "Must be a positive integer."]]])
-
 (defn register-workload
       "Tests linearizable reads, writes, and compare-and-set operations on
       independent keys."
@@ -142,6 +127,21 @@
   "A map of workload names to functions that construct workloads, given opts."
   {"set"      set/workload
    "register" register-workload})
+
+(def cli-opts
+	"Additional command line options."
+	[["-w" "--workload NAME" "What workload should we run?"
+    :missing  (str "--workload " (cli/one-of workloads))
+    :validate [workloads (cli/one-of workloads)]]
+   ["-q" "--quorum" "Use quorum reads, instead of reading from any primary."]
+	 ["-r" "--rate HZ" "Approximate number of requests per second, per thread."
+		:default  10
+		:parse-fn read-string
+		:validate [#(and (number? %) (pos? %)) "Must be a positive number"]]
+	 [nil "--ops-per-key NUM" "Maximum number of operations on any given key."
+		:default  100
+		:parse-fn parse-long
+		:validate [pos? "Must be a positive integer."]]])
 
 (defn etcd-test
       "Given an options map from the command line runner (e.g. :nodes, :ssh,
