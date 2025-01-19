@@ -162,10 +162,15 @@
                                                {:type :info, :f :stop}]))
                                      (gen/time-limit (:time-limit opts)))}))
 
+(def cli-opts
+"Additional command line options."
+[["-q" "--quorum" "Use quorum reads, instead of reading from any primary."]])
+
 (defn -main
       "Handles command line arguments. Can either run a test, or a web server for
       browsing results."
       [& args]
-      (cli/run! (merge (cli/single-test-cmd {:test-fn etcd-test})
+      (cli/run! (merge (cli/single-test-cmd {:test-fn etcd-test
+																						 :opt-spec cli-opts})
                        (cli/serve-cmd))
                 args))
