@@ -128,6 +128,17 @@
              (log-files [_ test node]
                         [logfile])))
 
+(def cli-opts
+	"Additional command line options."
+	[["-q" "--quorum" "Use quorum reads, instead of reading from any primary."]
+	 ["-r" "--rate HZ" "Approximate number of requests per second, per thread."
+		:default 10
+		:parse-fn read-string
+		:validate [#(and (number? %) (pos? %))] "Must be a positive number"]
+	 [nil "--ops-per-key NUM" "Maximum number of operations on any given key. "
+		:default 10
+		:parse-fn parse-long
+		:validate [pos? "Must be a positive integer."]]])
 
 (defn etcd-test
       "Given an options map from the command line runner (e.g. :nodes, :ssh,
@@ -156,18 +167,14 @@
                                        (range)
                                        (fn [k]
                                            (->> (gen/mix [r w cas])
-                                                (gen/stagger 1/50)
-                                                (gen/limit 100))))
+                                                (gen/stagger (/ (:rate opts)))
+                                                (gen/limit (:ops-per-key opts)))))
                                      (gen/nemesis
                                        (cycle [(gen/sleep 5)
                                                {:type :info, :f :start}
                                                (gen/sleep 5)
                                                {:type :info, :f :stop}]))
                                      (gen/time-limit (:time-limit opts)))})))
-
-(def cli-opts
-"Additional command line options."
-[["-q" "--quorum" "Use quorum reads, instead of reading from any primary."]])
 
 (defn -main
       "Handles command line arguments. Can either run a test, or a web server for
