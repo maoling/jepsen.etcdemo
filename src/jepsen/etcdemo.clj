@@ -167,20 +167,7 @@
                    :checker    (checker/compose
                                  {:perf     (checker/perf)
                                   :workload (:checker workload)})
-                   :generator       (->> (independent/concurrent-generator
-                                           10
-                                           (range)
-                                           (fn [k]
-                                               (->> (gen/mix [r w cas])
-                                                    (gen/stagger (/ (:rate opts)))
-                                                    (gen/limit (:ops-per-key opts)))))
-                                         (gen/nemesis
-                                           (->> [(gen/sleep 5)
-                                                 {:type :info, :f :start}
-                                                 (gen/sleep 5)
-                                                 {:type :info, :f :stop}]
-                                                cycle))
-                                         (gen/time-limit (:time-limit opts)))}
+                   }
                   {:client    (:client workload)
                    :checker   (:checker workload)
                    :generator (gen/phases
