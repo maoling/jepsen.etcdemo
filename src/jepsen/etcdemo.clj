@@ -167,9 +167,6 @@
                    :checker    (checker/compose
                                  {:perf     (checker/perf)
                                   :workload (:checker workload)})
-                   }
-                  {:client    (:client workload)
-                   :checker   (:checker workload)
                    :generator (gen/phases
                                 (->> (:generator workload)
                                      (gen/stagger (/ (:rate opts)))
@@ -183,7 +180,8 @@
                                 (gen/nemesis (gen/once {:type :info, :f :stop}))
                                 (gen/log "Waiting for recovery")
                                 (gen/sleep 10)
-                                (gen/clients (:final-generator workload)))})))
+                                (gen/clients (:final-generator workload)))
+                   })))
 
 
 (defn -main
